@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<resources>
+<?xml version="1.0" encoding="utf-8"?><resources>
 
     <!-- App title and fragment titles -->
     <string name="app_name">Track My Sleep Quality</string>
