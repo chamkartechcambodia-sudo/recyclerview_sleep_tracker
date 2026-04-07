@@ -49,6 +49,11 @@ class SleepDetailFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
+        // Set the current night on the binding so BindingAdapters receive SleepNight (not LiveData).
+        sleepDetailViewModel.night.observe(viewLifecycleOwner) {
+            binding.night = it
+        }
+
         // Add an Observer to the state variable for Navigating when a Quality icon is tapped.
         sleepDetailViewModel.navigateToSleepTracker.observe(viewLifecycleOwner) {
             if (it == true) { // Observed state is true.
