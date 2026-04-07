@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -45,7 +46,6 @@ class SleepTrackerFragment : Fragment() {
 
         binding.sleepTrackerViewModel = sleepTrackerViewModel
 
-        //binding.setLifecycleOwner(this)
         binding.lifecycleOwner = this
 
         // Add an Observer on the state variable for showing a Snackbar message
@@ -61,7 +61,7 @@ class SleepTrackerFragment : Fragment() {
                 // has a configuration change.
                 sleepTrackerViewModel.doneShowingSnackbar()
             }
-        }
+        })
 
         // Add an Observer on the state variable for Navigating when STOP button is pressed.
         sleepTrackerViewModel.navigateToSleepQuality.observe(viewLifecycleOwner) { night ->
@@ -80,39 +80,24 @@ class SleepTrackerFragment : Fragment() {
                 // has a configuration change.
                 sleepTrackerViewModel.doneNavigating()
             }
-        }
+        })
 
-        sleepTrackerViewModel.navigateToSleepDataQuality.observe(viewLifecycleOwner) { night ->
-            night?.let {
-
-                this.findNavController().navigate(
-                        SleepTrackerFragmentDirections
-                                .actionSleepTrackerFragmentToSleepDetailFragment(night))
-                sleepTrackerViewModel.onSleepDataQualityNavigated()
-            }
-        }
+        // TODO (05) Add an observer for navigateToSleepDataQuality.
 
         val manager = GridLayoutManager(activity, 3)
         binding.sleepList.layoutManager = manager
 
-        manager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int) =  when (position) {
-                0 -> 3
-                else -> 1
-            }
-        }
-
+        // TODO (02) Replace the Toast message with code to pass nightId to the view model.
         val adapter = SleepNightAdapter(SleepNightListener { nightId ->
-            sleepTrackerViewModel.onSleepNightClicked(nightId)
+            Toast.makeText(context, "${nightId}", Toast.LENGTH_LONG).show()
         })
-
         binding.sleepList.adapter = adapter
 
         sleepTrackerViewModel.nights.observe(viewLifecycleOwner) {
             it?.let {
-                adapter.addHeaderAndSubmitList(it)
+                adapter.submitList(it)
             }
-        }
+        })
 
         return binding.root
     }
