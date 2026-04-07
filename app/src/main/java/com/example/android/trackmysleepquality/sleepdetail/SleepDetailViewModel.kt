@@ -26,10 +26,7 @@ class SleepDetailViewModel(
     /**
      */
 
-    private val night = MediatorLiveData<SleepNight>()
-
-    fun getNight() = night
-
+    val night = MediatorLiveData<SleepNight>()
     init {
         night.addSource(database.getNightWithId(sleepNightKey), night::setValue)
     }
