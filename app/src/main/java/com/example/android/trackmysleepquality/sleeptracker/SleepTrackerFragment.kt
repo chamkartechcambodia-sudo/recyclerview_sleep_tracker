@@ -45,7 +45,6 @@ class SleepTrackerFragment : Fragment() {
 
         binding.sleepTrackerViewModel = sleepTrackerViewModel
 
-        //binding.setLifecycleOwner(this)
         binding.lifecycleOwner = this
 
         // Add an Observer on the state variable for showing a Snackbar message
@@ -61,7 +60,7 @@ class SleepTrackerFragment : Fragment() {
                 // has a configuration change.
                 sleepTrackerViewModel.doneShowingSnackbar()
             }
-        }
+        })
 
         // Add an Observer on the state variable for Navigating when STOP button is pressed.
         sleepTrackerViewModel.navigateToSleepQuality.observe(viewLifecycleOwner) { night ->
@@ -80,7 +79,7 @@ class SleepTrackerFragment : Fragment() {
                 // has a configuration change.
                 sleepTrackerViewModel.doneNavigating()
             }
-        }
+        })
 
         sleepTrackerViewModel.navigateToSleepDataQuality.observe(viewLifecycleOwner) { night ->
             night?.let {
@@ -90,17 +89,10 @@ class SleepTrackerFragment : Fragment() {
                                 .actionSleepTrackerFragmentToSleepDetailFragment(night))
                 sleepTrackerViewModel.onSleepDataQualityNavigated()
             }
-        }
+        })
 
         val manager = GridLayoutManager(activity, 3)
         binding.sleepList.layoutManager = manager
-
-        manager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int) =  when (position) {
-                0 -> 3
-                else -> 1
-            }
-        }
 
         val adapter = SleepNightAdapter(SleepNightListener { nightId ->
             sleepTrackerViewModel.onSleepNightClicked(nightId)
@@ -112,7 +104,7 @@ class SleepTrackerFragment : Fragment() {
             it?.let {
                 adapter.addHeaderAndSubmitList(it)
             }
-        }
+        })
 
         return binding.root
     }
