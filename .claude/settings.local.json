@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xcopy /E /I /H /Y \"E:\\\\work\\\\migrate\\\\Work\\\\IT STEP\\\\Android JavaKotlin\\\\E17\\\\Day19-20\\\\andfun-kotlin-sleep-tracker-with-recyclerview\" \"E:\\\\work\\\\migrate\\\\Work\\\\IT STEP\\\\Android JavaKotlin\\\\android-kotlin-m5-sleeptracker\")"
+    ]
+  }
+}
