@@ -1,110 +1,180 @@
-# RecyclerView - SleepQualityTracker with RecyclerView app
+# Sleep Tracker — Android Kotlin M5
 
-This is the toy app for Lesson 7 of the [Android App Development in Kotlin course on Udacity](https://classroom.udacity.com/courses/ud9012/).
+**STEP IT Academy** — Android Mobile Application Development (Kotlin + XML UI)
+> Module 5 — RecyclerView: ListAdapter, DiffUtil, DataBinding Adapters, GridLayout, Click Listeners, List Headers
 
-## SleepQualityTracker with RecyclerView
-
-This app builds on the SleepQualityTracker you developed in Lesson 6.  In this lesson you'll learn how to display a list of results in a RecyclerView instead of a static ScrollView. You'll also learn how you can refactor your code to make it more efficient so it will be easier to maintain and test.
+---
 
 ## Screenshots
 
-![Screenshot1](screenshots/sleep_tracker_recycler_home.png)
-![Screenshot2](screenshots/sleep_tracker_recycler_detail.png)
+![Home](app/src/main/ic_launcher_sleep_tracker-web.png)
 
-## How to use this repo while taking the course
+---
 
+## About
 
-Each code repository in this class has a chain of commits that looks like this:
+Sleep Tracker lets you record when you go to sleep and when you wake up, then rate your sleep quality. This module extends the M4 Room version by replacing the static ScrollView with a **RecyclerView** — you will progressively refactor the adapter from a basic `RecyclerView.Adapter` all the way to a `ListAdapter` with `DiffUtil`, DataBinding, Binding Adapters, and a GridLayout with a header item.
 
-![listofcommits](https://d17h27t6h515a5.cloudfront.net/topher/2017/March/58befe2e_listofcommits/listofcommits.png)
+---
 
-These commits show every step you'll take to create the app. Each commit contains instructions for completing the that step.
+## Architecture
 
-Each commit also has a **branch** associated with it of the same name as the commit message, as seen below:
+**Pattern:** MVVM (Model–View–ViewModel)
 
-![branches](https://d17h27t6h515a5.cloudfront.net/topher/2017/April/590390fe_branches-ud855/branches-ud855.png
-)
-Access all branches from this tab.
+```
++----------------------------------------------------------+
+|                        UI Layer                          |
+|  SleepTrackerFragment  -->  SleepTrackerViewModel        |
+|  SleepQualityFragment  -->  SleepQualityViewModel        |
+|  SleepDetailFragment   -->  SleepDetailViewModel         |
++----------------------------+-----------------------------+
+                             | LiveData (observe)
++----------------------------v-----------------------------+
+|                      Data Layer                          |
+|  SleepDatabaseDao  <--  SleepDatabase (Room)            |
+|  SleepNight (Entity)                                     |
++----------------------------------------------------------+
 
-![listofbranches](https://d17h27t6h515a5.cloudfront.net/topher/2017/March/58befe76_listofbranches/listofbranches.png
-)
-
-
-![branchesdropdown](https://d17h27t6h515a5.cloudfront.net/topher/2017/April/590391a3_branches-dropdown-ud855/branches-dropdown-ud855.png
-)
-
-The branches are also accessible from the drop-down in the "Code" tab.
-
-## Requirements
-
-1. Android Studio (Jellyfish or above)
-2. JDK 21 with `JAVA_HOME` environment variable set. If you don't have JDK 21 installed or `JAVA_HOME` is not set, consider using a tool like `sdkman` to simplify the process. Refer to the sdkman documentation for installation instructions: [sdkman installation](https://sdkman.io/install)
-
-## Working with the Course Code
-
-Here are the basic steps for working with and completing exercises in the repo.
-
-The basic steps are:
-
-1. Clone the repo.
-2. Check out the branch corresponding to the step you want to attempt.
-3. Find and complete the TODOs.
-4. Optionally commit your code changes.
-5. Compare your code with the solution.
-6. Repeat steps 2-5 until you've gone trough all the steps to complete the toy app.
-
-
-**Step 1: Clone the repo**
-
-As you go through the course, you'll be instructed to clone the different exercise repositories, so you don't need to set these up now. You can clone a repository from github in a folder of your choice with the command:
-
-```bash
-git clone https://github.com/udacity/REPOSITORY_NAME.git
+RecyclerView Stack:
+  SleepNightAdapter (ListAdapter + DiffUtil)
+    +-- SleepNightDiffCallback
+    +-- ViewHolder (DataBinding)
+    +-- BindingUtils (@BindingAdapter)
+    +-- Header item (sealed DataItem)
 ```
 
-**Step 2: Check out the step branch**
+**Key concepts:** RecyclerView, ListAdapter, DiffUtil, DataBinding in adapter, BindingAdapters, GridLayoutManager, click listeners, SafeArgs navigation, Room + Coroutines, LiveData.map
 
-As you go through different steps in the code, you'll be told which step you're on, as well as a link to the corresponding branch.
+---
 
-You'll want to check out the branch associated with that step. The command to check out a branch would be:
+## Project Structure
 
-```bash
-git checkout BRANCH_NAME
+```
+app/src/main/java/com/example/android/trackmysleepquality/
+├── MainActivity.kt
+├── Util.kt                          # formatNights() helper, Spanned formatting
+├── database/
+│   ├── SleepNight.kt               # Room Entity
+│   ├── SleepDatabaseDao.kt         # Room DAO
+│   └── SleepDatabase.kt            # Room Database (singleton)
+├── sleeptracker/
+│   ├── SleepTrackerFragment.kt     # Main list screen
+│   ├── SleepTrackerViewModel.kt    # Start/stop/clear logic + LiveData
+│   ├── SleepTrackerViewModelFactory.kt
+│   ├── SleepNightAdapter.kt        # RecyclerView ListAdapter + DiffUtil
+│   └── BindingUtils.kt             # @BindingAdapter extensions
+├── sleepquality/
+│   ├── SleepQualityFragment.kt     # Rate sleep quality screen
+│   ├── SleepQualityViewModel.kt
+│   └── SleepQualityViewModelFactory.kt
+└── sleepdetail/
+    ├── SleepDetailFragment.kt      # Detail view for one night
+    ├── SleepDetailViewModel.kt
+    └── SleepDetailViewModelFactory.kt
 ```
 
-**Step 3: Find and complete the TODOs**
+---
 
-Once you've checked out the branch, you'll have the code in the exact state you need. You'll even have TODOs, which are special comments that tell you all the steps you need to complete the exercise. You can easily navigate to all the TODOs using Android Studio's TODO tool. To open the TODO tool, click the button at the bottom of the screen that says TODO. This will display a list of all comments with TODO in the project. 
+## Navigation Flow
 
-We've numbered the TODO steps so you can do them in order:
-![todos](https://d17h27t6h515a5.cloudfront.net/topher/2017/March/58bf00e7_todos/todos.png
-)
-
-**Step 4: Commit your code changes**
-
-After You've completed the TODOs, you can optionally commit your changes. This will allow you to see the code you wrote whenever you return to the branch. The following git code will add and save **all** your changes.
-
-```bash
-git add .
-git commit -m "Your commit message"
+```
+SleepTrackerFragment
+    |
+    +---> (START + STOP) SleepQualityFragment
+    |           | sleepNightKey: Long (SafeArgs)
+    |           +---> back to SleepTrackerFragment (popUpTo inclusive)
+    |
+    +---> (tap list item) SleepDetailFragment
+                | sleepNightKey: Long (SafeArgs)
+                +---> back to SleepTrackerFragment (popUpTo inclusive)
 ```
 
-**Step 5: Compare with the solution**
+---
 
-Most exercises will have a list of steps for you to check off in the classroom. Once you've checked these off, you'll see a pop up window with a link to the solution code. Note the **Diff** link:
+## Tech Stack
 
-![solutionwindow](https://d17h27t6h515a5.cloudfront.net/topher/2017/March/58bf00f9_solutionwindow/solutionwindow.png
-)
+| Library | Version |
+|---|---|
+| Android Gradle Plugin | 9.0.1 |
+| Gradle Wrapper | 9.2.1 |
+| Kotlin (bundled with AGP) | — |
+| AndroidX Core KTX | 1.18.0 |
+| AppCompat | 1.7.1 |
+| Material | 1.13.0 |
+| ConstraintLayout | 2.2.1 |
+| Navigation Component | 2.9.7 |
+| Lifecycle ViewModel + LiveData | 2.9.0 |
+| Room | 2.7.1 |
+| Coroutines (Android) | 1.10.2 |
+| KSP | 2.1.20-1.0.32 |
 
-The **Diff** link will take you to a Github diff as seen below:
-![diff](https://d17h27t6h515a5.cloudfront.net/topher/2017/March/58bf0108_diffsceenshot/diffsceenshot.png
-)
+---
 
-All of the code that was added in the solution is in green, and the removed code (which will usually be the TODO comments) is in red. 
+## Build Requirements
 
-You can also compare your code locally with the branch of the following step.
+| Tool | Version |
+|---|---|
+| Android Studio | Meerkat (2024.3+) |
+| JDK | 21 |
+| Min SDK | 24 |
+| Target SDK | 36 |
+| Compile SDK | 36 |
 
-## Report Issues
-Notice any issues with a repository? Please file a github issue in the repository.
+**JDK setup in Android Studio:**
+`File → Settings → Build, Execution, Deployment → Build Tools → Gradle → Gradle JDK` → select **Embedded JDK**
 
+---
 
+## How to Work with This Repo
+
+### Branch structure
+
+| Branch pattern | Purpose |
+|---|---|
+| `main` | Complete solution — full working app |
+| `Step.XX-Exercise-<Topic>` | Starter code with TODO comments |
+| `Step.XX-Solution-<Topic>` | Reference answer for the exercise |
+
+### Workflow per step
+
+```bash
+# 1. Check out the exercise branch for the step you are on
+git checkout Step.01-Exercise-Add-a-RecyclerView
+
+# 2. Open in Android Studio — find TODOs in the TODO panel (View > Tool Windows > TODO)
+
+# 3. Complete each TODO in order
+
+# 4. Compare with the solution branch
+git diff Step.01-Solution-Add-a-RecyclerView
+```
+
+---
+
+## Exercise Steps
+
+| Step | Branch | Topic | Key Files |
+|---|---|---|---|
+| 01 | Step.01-Exercise-Add-a-RecyclerView | Add RecyclerView to layout | `fragment_sleep_tracker.xml`, `SleepTrackerFragment.kt` |
+| 02 | Step.02-Exercise-Display-Data | Create ViewHolder and Adapter | `SleepNightAdapter.kt` |
+| 03 | Step.03-Exercise-Recycling-ViewHolders | Efficient ViewHolder pattern | `SleepNightAdapter.kt` |
+| 04 | Step.04-Exercise-Display-SleepQuality-List | Show sleep quality in list | `SleepNightAdapter.kt`, `list_item_sleep_night.xml` |
+| 05 | Step.05-Exercise-Refactor-onBindViewHolder | Refactor bind logic into ViewHolder | `SleepNightAdapter.kt` |
+| 06 | Step.06-Exercise-Refactor-onCreateViewHolder | Refactor ViewHolder creation | `SleepNightAdapter.kt` |
+| 07 | Step.07-Exercise-Add-DiffUtil-to-Adapter | ListAdapter + DiffUtil | `SleepNightAdapter.kt` |
+| 08 | Step.08-Exercise-Add-DataBinding-to-Adapter | DataBinding in ViewHolder | `SleepNightAdapter.kt`, `list_item_sleep_night.xml` |
+| 09 | Step.09-Exercise-Add-Binding-Adapters | @BindingAdapter extensions | `BindingUtils.kt` |
+| 10 | Step.10-Exercise-Replace-LinearLayout-with-GridLayout | GridLayoutManager | `SleepTrackerFragment.kt` |
+| 11 | Step.11-Exercise-Implement-a-Click-Listener | Click listener in adapter | `SleepNightAdapter.kt`, `SleepTrackerFragment.kt` |
+| 12 | Step.12-Exercise-Navigate-on-Click | Navigate to detail with SafeArgs | `SleepTrackerFragment.kt`, `SleepTrackerViewModel.kt` |
+| 13 | Step.13-Exercise-Add-a-List-Header | Header item with sealed class | `SleepNightAdapter.kt` |
+| 14 | Step.14-Exercise-Add-Header-to-GridLayout | GridLayoutManager spanSizeLookup | `SleepTrackerFragment.kt` |
+
+---
+
+## Course Info
+
+- **Instructor:** Magn
+- **Organization:** [chamkartechcambodia-sudo](https://github.com/chamkartechcambodia-sudo)
+- **Course:** Android Mobile Application Development — Kotlin + XML UI
+- **Batch:** Batch 1 · Module 5 (Day 19–20)
