@@ -63,7 +63,7 @@ class SleepDetailFragment : Fragment() {
                 // has a configuration change.
                 sleepDetailViewModel.doneNavigating()
             }
-        })
+        }
 
         return binding.root
     }
